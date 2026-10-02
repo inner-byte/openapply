@@ -1,0 +1,12 @@
+{
+  "date": "September 25, 2026",
+  "email": "ahmad@example.com",
+  "full_name": "Ahmad Example",
+  "mobile": "+1 555 010 2030",
+  "paragraphs": [
+    "I came to data through mathematics. A bachelor's degree in the subject taught me to distrust any number I could not derive, and that habit has shaped every analysis I have produced since. When I later moved into applied computing, I found the same discipline waiting in a new form: clean the data first, question the model second, and never present a result you cannot explain.",
+    "My master's work and internship gave that discipline practical weight. I automated reporting pipelines that cut processing time by a fifth, built forecasting models that reached 96% accuracy on student performance data, and learned that the most valuable skill in analytics is not the algorithm but the judgment to know when the data does not support the conclusion someone wants.",
+    "What I want next is to practice that judgment at a higher standard of responsibility. I am drawn to teams where evidence is treated as a commitment rather than a decoration — where a dashboard is a promise to the people who rely on it. That is the analyst I am training to become, and the colleague I intend to be."
+  ],
+  "title": "Personal Statement"
+}

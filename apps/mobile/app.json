@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "OpenApply",
+    "slug": "openapply",
+    "scheme": "openapply",
+    "version": "0.1.0",
+    "orientation": "default",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": { "supportsTablet": true, "bundleIdentifier": "app.openapply.mobile" },
+    "android": { "package": "app.openapply.mobile" },
+    "web": { "bundler": "metro", "name": "OpenApply — a little room for everything" },
+    "plugins": [
+      "expo-document-picker",
+      "@config-plugins/react-native-blob-util",
+      "@config-plugins/react-native-pdf"
+    ]
+  }
+}

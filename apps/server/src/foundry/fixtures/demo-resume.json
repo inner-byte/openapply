@@ -1,0 +1,115 @@
+{
+  "certificates": [
+    {
+      "bullets": [
+        "Mastered fundamental Python syntax, proficiently utilizing control flow, loops, functions, and data structures.",
+        "Acquired expertise in procedural programming paradigms and associated logical concepts, enhancing capabilities."
+      ],
+      "dates": "March 2023",
+      "tag": "CERTIFICATE",
+      "title": "Programming in Python (Meta)"
+    },
+    {
+      "bullets": [
+        "Learned about the data ecosystem, including the ETL process and big data basics.",
+        "Mastered data gathering, identification, and cleaning for analysis preparation."
+      ],
+      "dates": "March 2023",
+      "tag": "CERTIFICATE",
+      "title": "Introduction to Data Analyst (IBM)"
+    },
+    {
+      "bullets": [
+        "Developed a comprehensive understanding of the data life cycle and various stages involved in the data analysis.",
+        "Introduced to diverse applications designed to streamline and optimize the data analysis journey, enhancing efficiency and accuracy."
+      ],
+      "dates": "March 2023",
+      "tag": "CERTIFICATE",
+      "title": "Foundations: Data, Data, Everywhere(Google)"
+    }
+  ],
+  "education": [
+    {
+      "dates": "June 2022 - August 2024",
+      "degree": "Master of Computer Application; GPA: 8.06",
+      "institution": "Vellore Institute of Technology",
+      "location": "Bhopal, India"
+    },
+    {
+      "dates": "June 2018 - August 2021",
+      "degree": "Bachelor of Science (HONORS) - Mathematics; GPA: 8.70",
+      "institution": "Barasat Govt. College",
+      "location": "Kolkata, India"
+    }
+  ],
+  "email": "ahmad@example.com",
+  "experience": [
+    {
+      "bullets": [
+        "Streamlined data collection and reporting procedures, reducing processing time by 20% enhancing efficiency.",
+        "Implemented process improvements and automation solutions, resulting in 15% increase in productivity.",
+        "Collaborated with 3+ cross-functional teams to gather requirements, define project scopes, and ensure alignment with business objectives, fostering effective teamwork and project success.",
+        "Produced 15+ comprehensive reports and presentations summarizing findings and recommendations, facilitating clear communication with stakeholders and driving actionable outcomes.",
+        "Conducted in-depth market research and analysis, resulting in the identification of 10+ key trends and insights that informed strategic decision-making processes."
+      ],
+      "dates": "January 24- March 24",
+      "tag": "LINK",
+      "tag_url": "https://example.com",
+      "title": "Business Analyst Intern | WS"
+    }
+  ],
+  "full_name": "Ahmad Example",
+  "links": [
+    { "label": "Ahmad Example | LinkedIn", "url": "https://linkedin.com" },
+    { "label": "ahmadexample (Ahmad Example) (github.com)", "url": "https://github.com" }
+  ],
+  "mobile": "+1 555 010 2030",
+  "projects": [
+    {
+      "bullets": [
+        "Achieved a 96% accuracy rate in forecasting student academic performance by developing and deploying a machine learning model.",
+        "Managed data integrity by handling missing values and encoding categorical variables, enhancing quality by 33%.",
+        "Conducted experiments with both classification and regression algorithms to identify the most suitable approach."
+      ],
+      "dates": "December 23- February 2024",
+      "tag": "LINK",
+      "tag_url": "https://example.com",
+      "title": "Student Performance Prediction"
+    },
+    {
+      "bullets": [
+        "Developed and fine-tuned a logistic regression-based machine learning model achieving an 87% accuracy rate in predicting credit card fraud.",
+        "Minimized false positives by 16% through rigorous feature engineering and hyperparameter tuning processes.",
+        "Implemented under-sampling and ensemble techniques to address class imbalance, leading to 15% improved performance."
+      ],
+      "dates": "September 23- October 2023",
+      "tag": "LINK",
+      "tag_url": "https://example.com",
+      "title": "Credit Card Fraud Detection"
+    },
+    {
+      "bullets": [
+        "Orchestrated the development of a Logit model to predict heart disease, achieving an impressive accuracy rate of 91% and surpassing industry benchmarks.",
+        "Spearheaded the implementation of HIPAA-compliant data encryption protocols across all healthcare solutions, decreasing data breach incidents by 40% and ensuring patient privacy and security.",
+        "Demonstrated commitment to ethical data practices while contributing to the development of data-driven healthcare solutions."
+      ],
+      "dates": "July 23- August 2023",
+      "tag": "LINK",
+      "tag_url": "https://example.com",
+      "title": "Heart Disease Prediction"
+    }
+  ],
+  "skills": [
+    { "category": "Languages", "items": "Python, SQL, JAVA" },
+    { "category": "Frameworks", "items": "Pandas, Numpy, Scikit-Learn, Matplotlib" },
+    { "category": "Tools", "items": "Power BI, Excel, PowerPoint, Tableau, MySQL, SQLite" },
+    {
+      "category": "Platforms",
+      "items": "PyCharm, Jupyter Notebook, Visual Studio Code, IntelliJ IDEA"
+    },
+    {
+      "category": "Soft Skills",
+      "items": "Rapport Building, Strong Stakeholder management, People Management, Excellent communication"
+    }
+  ]
+}
