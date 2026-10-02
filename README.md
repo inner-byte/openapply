@@ -45,8 +45,8 @@ You need **Node.js 22+**, **pnpm**, and **git** on your computer. About ten minu
 Download the latest release archive and extract it, or clone the repository:
 
 ```bash
-mkdir -p ~/openapply && cd ~/openapply
-unzip ~/Downloads/openapply-v2-no-copilotkit.zip
+git clone https://github.com/inner-byte/openapply.git
+cd openapply
 ```
 
 ### 2. Install dependencies
