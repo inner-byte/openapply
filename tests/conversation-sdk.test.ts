@@ -1,31 +1,19 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { AbstractAgent } from "@ag-ui/client";
-import { CopilotKitCore } from "@copilotkit/core";
-import { throwError } from "rxjs";
 import { ConversationQueue } from "../apps/mobile/src/conversation-queue.ts";
 import { runConversationTurn } from "../apps/mobile/src/conversation-run.ts";
 
-test("an emitted CopilotKit run error stops the queue even when runAgent resolves", async () => {
+test("a rejected turn stops the queue and leaves the next message pending", async () => {
   let attempts = 0;
-  class FailingAgent extends AbstractAgent {
-    run() {
-      attempts++;
-      return throwError(() => new Error("Connection interrupted"));
-    }
-  }
-  const agent = new FailingAgent({ agentId: "default" });
-  const core = new CopilotKitCore({ agents__unsafe_dev_only: { default: agent } });
   const queue = new ConversationQueue();
   queue.enqueue({ id: "first", text: "First task" });
   queue.enqueue({ id: "second", text: "Second task" });
   await assert.rejects(
     queue.flush(() =>
-      runConversationTurn(
-        "default",
-        () => core.runAgent({ agent }),
-        (onError) => core.subscribe({ onError }),
-      ),
+      runConversationTurn(async () => {
+        attempts++;
+        throw new Error("Connection interrupted");
+      }),
     ),
     /Connection interrupted/,
   );
@@ -35,4 +23,15 @@ test("an emitted CopilotKit run error stops the queue even when runAgent resolve
     queue.getSnapshot().pending.map((message) => message.id),
     ["second"],
   );
+});
+
+test("a resolved turn runs the queued messages to completion", async () => {
+  const sent: string[] = [];
+  const queue = new ConversationQueue();
+  queue.enqueue({ id: "first", text: "First task" });
+  queue.enqueue({ id: "second", text: "Second task" });
+  await queue.flush((message) => runConversationTurn(async () => void sent.push(message.id)));
+  assert.deepEqual(sent, ["first", "second"]);
+  assert.equal(queue.getSnapshot().paused, false);
+  assert.equal(queue.getSnapshot().pending.length, 0);
 });

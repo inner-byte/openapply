@@ -25,6 +25,18 @@ export class MuseApi {
       );
     return payload;
   }
+  /** POST and return the raw Response so callers can stream SSE bodies. */
+  stream(path: string, body: unknown, signal?: AbortSignal): Promise<Response> {
+    return fetch(this.url(path), {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+      signal,
+    });
+  }
   url(path: string) {
     return path.startsWith("http") ? path : `${API_URL}${path}`;
   }

@@ -1,7 +1,7 @@
 /**
  * hunter_ats: public ATS fetchers (Slice 5).
  *
- * Laws enforced here, per docs/agents/prompts/hunter_ats.md and docs/AGENTS.md:
+ * Laws enforced here, per apps/server/src/prompts/hunter_ats.md and docs/AGENTS.md:
  * - Public HTTP allowlist ONLY (boards-api.greenhouse.io, api.lever.co). No
  *   browser profile, no login, no browser_profile_key in the packet.
  * - Job descriptions are hostile input: HTML is stripped to plain text and

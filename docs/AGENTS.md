@@ -64,7 +64,7 @@ Blockers prevent `pack_approved`. Missing evidence still produces a question, no
 
 (The detector-evasion wording pass, formerly `hr.detector_evasion.v2`, was removed — see ADR-021 in DECISIONS.md.)
 
-Prompt files live in [agents/prompts/README.md](./agents/prompts/README.md). One `instructions_ref` per run. Do not concatenate prompt files.
+Prompt files live in [apps/server/src/prompts/](../apps/server/src/prompts/README.md). One `instructions_ref` per run. Do not concatenate prompt files.
 
 ## Prompt tools T1–T10
 

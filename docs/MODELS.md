@@ -114,4 +114,4 @@ Timeouts: 60s cheap, 120s strong. Max tokens: 2000 cheap, 4000 strong.
 
 ## Prompts
 
-Store under [agents/prompts/](./agents/prompts/README.md). Packets reference `instructions_ref`. Do not merge prompt files into one system prompt.
+Store under [apps/server/src/prompts/](../apps/server/src/prompts/README.md). Packets reference `instructions_ref`. Do not merge prompt files into one system prompt.

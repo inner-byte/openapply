@@ -1,7 +1,7 @@
 /**
  * Slice 7 invariants: resume/cover/statement generation + packer wiring.
  * - Prompt packets load exactly one instructions_ref; they never concatenate
- *   docs/agents/prompts/.
+ *   apps/server/src/prompts/.
  * - Drafts cite the evidence locker: a certificate name not in the confirmed
  *   locker cannot appear in resume, cover, or statement (UNGROUNDED_CLAIM).
  * - A confirmed certificate issuer + title can be cited.
@@ -123,7 +123,6 @@ before(async () => {
     publicUrl: "http://localhost:8787",
     dataDir: directory,
     agentBackend: "sample",
-    intelligenceApiKey: "test-project-key-never-sent",
     googleRedirectUri: "http://localhost:8787/api/google/callback",
     allowedOrigins: ["http://localhost:8081"],
   };

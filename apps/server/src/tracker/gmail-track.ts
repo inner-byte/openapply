@@ -44,8 +44,8 @@ const PROMPT_FILE = "tracker.md";
 function promptsDir(): string {
   if (process.env.DOCS_PROMPTS_DIR) return process.env.DOCS_PROMPTS_DIR;
   const here = dirname(fileURLToPath(import.meta.url));
-  // apps/server/src/tracker -> repo root
-  return join(here, "..", "..", "..", "..", "docs", "agents", "prompts");
+  // apps/server/src/tracker -> apps/server/src/prompts
+  return join(here, "..", "prompts");
 }
 
 async function loadTrackerPrompt(): Promise<{ system: string }> {

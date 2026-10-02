@@ -1,20 +1,12 @@
-type RunError = { error: unknown; context?: { agentId?: string } };
-
-/** CopilotKit emits run failures through onError even when runAgent resolves. */
-export async function runConversationTurn(
-  agentId: string,
-  execute: () => Promise<unknown>,
-  subscribe: (listener: (event: RunError) => void) => { unsubscribe: () => void },
-) {
-  let failure: Error | undefined;
-  const subscription = subscribe((event) => {
-    if (event.context?.agentId && event.context.agentId !== agentId) return;
-    failure = event.error instanceof Error ? event.error : new Error(String(event.error));
-  });
-  try {
-    await execute();
-    if (failure) throw failure;
-  } finally {
-    subscription.unsubscribe();
-  }
+/**
+ * Runs one conversation turn against the OpenApply chat transport.
+ *
+ * Previously this wrapped CopilotKit's runAgent and translated its onError
+ * subscription into a thrown error. The new transport surfaces run failures
+ * (RUN_ERROR events, HTTP errors, network failures) as promise rejections
+ * from sendMessage itself, so this is now a thin pass-through kept so the
+ * queue/outbox flow in chat.tsx does not change shape.
+ */
+export async function runConversationTurn(execute: () => Promise<unknown>): Promise<void> {
+  await execute();
 }

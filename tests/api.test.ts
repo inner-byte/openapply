@@ -29,7 +29,6 @@ before(async () => {
     publicUrl: "http://localhost:8787",
     dataDir: directory,
     agentBackend: "sample",
-    intelligenceApiKey: "test-project-key-never-sent",
     googleRedirectUri: "http://localhost:8787/api/google/callback",
     allowedOrigins: ["http://localhost:8081"],
   };
@@ -178,17 +177,39 @@ function sampleRun(threadId: string, runId: string, messageId: string, content: 
 }
 
 test("sample agent streams actual AG-UI events without a model key", async () => {
-  const info = await app.request("/api/copilotkit/info", { headers: headers() });
-  assert.equal(info.status, 200);
-  const stream = JSON.stringify(
-    await lastValueFrom(
-      sampleRun("sample-test", "sample-run", "message1", "Show my calendar").pipe(toArray()),
-    ),
-  );
+  const created = await app.request("/api/threads", {
+    method: "POST",
+    headers: headers(),
+    body: JSON.stringify({}),
+  });
+  assert.equal(created.status, 201);
+  const { thread } = await created.json();
+  const response = await app.request("/api/chat/stream", {
+    method: "POST",
+    headers: headers(),
+    body: JSON.stringify({
+      threadId: thread.id,
+      message: { id: "message1", role: "user", content: "Show my calendar" },
+    }),
+  });
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") ?? "", /text\/event-stream/);
+  const stream = await response.text();
   assert.match(stream, /RUN_STARTED/);
   assert.match(stream, /TEXT_MESSAGE_CONTENT/);
   assert.match(stream, /RUN_FINISHED/);
   assert.match(stream, /Your local calendar has/);
+  // The turn persisted to the thread: the user message and the assistant reply.
+  const messages = await app.request(`/api/threads/${thread.id}/messages`, {
+    headers: headers(),
+  });
+  assert.equal(messages.status, 200);
+  const { messages: saved } = await messages.json();
+  assert.deepEqual(
+    saved.map((message: { role: string }) => message.role),
+    ["user", "assistant"],
+  );
+  assert.match(saved[1].content, /Your local calendar has/);
 });
 
 test("guided document delegation streams a rich tool result bound to its saved task", async () => {

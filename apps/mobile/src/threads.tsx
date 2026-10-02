@@ -1,4 +1,3 @@
-import { useThreads } from "@copilotkit/react-native/headless";
 import {
   Archive,
   CalendarDays,
@@ -9,10 +8,133 @@ import {
   RefreshCw,
   Settings2,
 } from "lucide-react-native";
-import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { Button, colors, ErrorNotice, Field, LinkRow, Sheet, s } from "./ui";
 import { useWorkspace } from "./workspace";
+
+/** Server thread shape from GET /api/threads. */
+export interface OpenApplyThread {
+  id: string;
+  name: string | null;
+  createdAt: string;
+  updatedAt: string;
+  archived: boolean;
+}
+
+interface ThreadsOptions {
+  enabled: boolean;
+  includeArchived: boolean;
+  limit: number;
+}
+
+/**
+ * Local replacement for the old useThreads headless hook, backed by the
+ * threads REST contract. Preserves the loading/error/refetch/rename/
+ * archive/unarchive/mutating/pagination states the UI already handles.
+ */
+function useOpenApplyThreads({ enabled, includeArchived, limit }: ThreadsOptions) {
+  const { api } = useWorkspace();
+  const [threads, setThreads] = useState<OpenApplyThread[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [isMutating, setIsMutating] = useState(false);
+  const [pageLimit, setPageLimit] = useState(limit);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [fetchMoreError, setFetchMoreError] = useState<Error | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
+
+  const load = useCallback(
+    async (fetchLimit: number, isMore: boolean) => {
+      if (isMore) setIsFetchingMore(true);
+      else setIsLoading(true);
+      try {
+        const { threads: items } = await api.request<{ threads: OpenApplyThread[] }>(
+          `/api/threads?limit=${fetchLimit}&includeArchived=${includeArchived}`,
+        );
+        setThreads(items);
+        setError(null);
+        if (isMore) setFetchMoreError(null);
+      } catch (e) {
+        const failure = e instanceof Error ? e : new Error(String(e));
+        if (isMore) setFetchMoreError(failure);
+        else setError(failure);
+      } finally {
+        if (isMore) setIsFetchingMore(false);
+        else setIsLoading(false);
+      }
+    },
+    [api, includeArchived],
+  );
+
+  useEffect(() => {
+    setPageLimit(limit);
+  }, [limit, includeArchived]);
+
+  useEffect(() => {
+    if (!enabled) {
+      setThreads([]);
+      setIsLoading(false);
+      return;
+    }
+    void load(pageLimit, false);
+  }, [enabled, includeArchived, pageLimit, reloadToken, load]);
+
+  const mutateThread = useCallback(
+    async (id: string, patch: { name?: string; archived?: boolean }) => {
+      setIsMutating(true);
+      setError(null);
+      try {
+        const result = await api.request<{ thread?: OpenApplyThread }>(
+          `/api/threads/${id}`,
+          patch,
+          "PATCH",
+        );
+        if (result.thread) {
+          const updated = result.thread;
+          setThreads((prev) => prev.map((t) => (t.id === id ? updated : t)));
+        } else {
+          setReloadToken((n) => n + 1);
+        }
+      } catch (e) {
+        const failure = e instanceof Error ? e : new Error(String(e));
+        setError(failure);
+        throw failure;
+      } finally {
+        setIsMutating(false);
+      }
+    },
+    [api],
+  );
+
+  return {
+    threads,
+    isLoading,
+    error,
+    refetchThreads: () => setReloadToken((n) => n + 1),
+    renameThread: (id: string, name: string) => mutateThread(id, { name }),
+    archiveThread: (id: string) => mutateThread(id, { archived: true }),
+    unarchiveThread: (id: string) => mutateThread(id, { archived: false }),
+    isMutating,
+    fetchMoreError,
+    // Without a cursor in the contract, "more" means a wider limit refetch.
+    hasMoreThreads: threads.length >= pageLimit,
+    isFetchingMoreThreads: isFetchingMore,
+    fetchMoreThreads: () => {
+      const next = pageLimit + limit;
+      setPageLimit(next);
+      void load(next, true);
+    },
+  };
+}
 
 function newThreadId() {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
@@ -112,7 +234,7 @@ export function ThreadsSheet({ onClose }: { onClose: () => void }) {
     start,
   } = useMuseThread();
   const { workspace, open, navigate, refresh } = useWorkspace();
-  const threads = useThreads({ agentId: "default", enabled, includeArchived: true, limit: 20 });
+  const threads = useOpenApplyThreads({ enabled, includeArchived: true, limit: 20 });
   const [editing, setEditing] = useState<string>();
   const [name, setName] = useState("");
   const [error, setError] = useState("");

@@ -171,7 +171,7 @@ test("terminal states cannot change manually", async () => {
 test("prompt packet pins instructions_ref tracker.v1 and cheap tier", async () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const system = await readFile(
-    join(here, "..", "docs", "agents", "prompts", "tracker.md"),
+    join(here, "..", "apps", "server", "src", "prompts", "tracker.md"),
     "utf8",
   );
   assert.equal(system.match(/^instructions_ref:\s*(\S+)/m)?.[1], "tracker.v1");

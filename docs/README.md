@@ -19,7 +19,7 @@ This directory is the source of truth. Chat transcripts are not.
 5. [ARCHITECTURE.md](./ARCHITECTURE.md)
 6. [DOMAIN.md](./DOMAIN.md)
 7. [AGENTS.md](./AGENTS.md)
-8. [agents/prompts/README.md](./agents/prompts/README.md)
+8. [Prompt index (versioned server source)](../apps/server/src/prompts/README.md)
 9. [FILES.md](./FILES.md)
 10. [BROWSER.md](./BROWSER.md)
 11. [MODELS.md](./MODELS.md)
@@ -47,5 +47,5 @@ This directory is the source of truth. Chat transcripts are not.
 
 - Behavior change requires a docs update in the same pull request.
 - Schema change updates `DOMAIN.md` and `BUILD.md`.
-- Agent contract change updates `AGENTS.md`, `agents/prompts/`, and `TESTING.md`.
+- Agent contract change updates `AGENTS.md`, `apps/server/src/prompts/`, and `TESTING.md`.
 - New third-party repo requires an ADR in `DECISIONS.md`.

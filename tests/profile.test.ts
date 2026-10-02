@@ -74,7 +74,6 @@ before(async () => {
     publicUrl: "http://localhost:8788",
     dataDir: directory,
     agentBackend: "sample",
-    intelligenceApiKey: "test-project-key-never-sent",
     encryptionKey: randomBytes(32).toString("base64"),
     googleRedirectUri: "http://localhost:8788/api/google/callback",
     allowedOrigins: ["http://localhost:8081"],

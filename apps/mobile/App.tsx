@@ -1,4 +1,3 @@
-import { CopilotKitProvider } from "@copilotkit/react-native/headless";
 import { StatusBar } from "expo-status-bar";
 import { Bell, Check, Menu, X } from "lucide-react-native";
 import { type ReactElement, useCallback, useEffect, useMemo, useState } from "react";
@@ -80,12 +79,7 @@ export default function App() {
     <SafeAreaProvider>
       <StatusBar style="dark" />
       {token ? (
-        <CopilotKitProvider
-          runtimeUrl={`${API_URL}/api/copilotkit`}
-          headers={{ Authorization: `Bearer ${token}` }}
-        >
-          <WorkspaceApp token={token} />
-        </CopilotKitProvider>
+        <WorkspaceApp token={token} />
       ) : (
         <SafeAreaView
           style={{

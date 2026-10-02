@@ -5,7 +5,7 @@
  *
  * Unlike document roles these runs may drive the browser, so the packet
  * policy allows browser use and forbids profile writes, exactly like the
- * docs runner. Prompts live in docs/agents/prompts/ and are loaded one at
+ * docs runner. Prompts live in apps/server/src/prompts/ and are loaded one at
  * a time; unknown refs fail instead of falling back.
  */
 import { randomUUID } from "node:crypto";
@@ -26,8 +26,8 @@ const APPLY_PROMPT_FILES: Record<string, string> = {
 function promptsDir(): string {
   if (process.env.DOCS_PROMPTS_DIR) return process.env.DOCS_PROMPTS_DIR;
   const here = dirname(fileURLToPath(import.meta.url));
-  // apps/server/src/apply -> repo root
-  return join(here, "..", "..", "..", "..", "docs", "agents", "prompts");
+  // apps/server/src/apply -> apps/server/src/prompts
+  return join(here, "..", "prompts");
 }
 
 export async function loadApplyPrompt(instructions_ref: string): Promise<{

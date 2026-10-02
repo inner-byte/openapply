@@ -3,11 +3,11 @@ import { randomUUID } from "node:crypto";
 import { test } from "node:test";
 import { AbstractAgent } from "@ag-ui/client";
 import type { RunAgentInput } from "@ag-ui/core";
-import type { ChatCompletionRequest, ChatMessage } from "@copilotkit/aimock";
-import { defineTool } from "@copilotkit/runtime/v2";
 import { z } from "zod";
+import type { ChatCompletionRequest, ChatMessage } from "../apps/server/src/demo/model.ts";
 import { createDemoModel, demoModel, demoResponse } from "../apps/server/src/demo/model.ts";
 import { tanstackAgent } from "../apps/server/src/engine/tanstack-agent.ts";
+import { defineTool } from "../apps/server/src/engine/tools.ts";
 
 const browseTool = {
   type: "function" as const,
@@ -130,18 +130,18 @@ test("demo only summarizes browser evidence belonging to the current user turn",
         truncated: false,
       }),
     },
-    { role: "user", content: "Now summarize https://copilotkit.ai" },
+    { role: "user", content: "Now summarize https://docs.ag-ui.com" },
   ];
   const reply = demoResponse(request(history));
   assert.ok("toolCalls" in reply && reply.toolCalls);
   assert.equal(reply.toolCalls[0].name, "browse_web");
-  assert.deepEqual(JSON.parse(reply.toolCalls[0].arguments), { url: "https://copilotkit.ai" });
+  assert.deepEqual(JSON.parse(reply.toolCalls[0].arguments), { url: "https://docs.ag-ui.com" });
 });
 
 test("demo reports missing or failed browser evidence without inventing a summary", () => {
   const reply = demoResponse(
     request([
-      { role: "user", content: "Summarize copilotkit.ai" },
+      { role: "user", content: "Summarize the AG-UI docs" },
       {
         role: "tool",
         tool_call_id: "call_openapply_demo_browse_failure",
@@ -176,10 +176,10 @@ test("AI Mock drives the real TanStack BuiltInAgent through two browser tool rou
           return {
             sessionId: randomUUID(),
             url,
-            title: url.includes("ycombinator") ? "Hacker News" : "CopilotKit",
+            title: url.includes("ycombinator") ? "Hacker News" : "AG-UI docs",
             text: url.includes("ycombinator")
               ? "Hacker News\n1.\t\n\tTest headline returned only by this tool\n2. Another observed headline\n3.\nA third observed headline"
-              : "CopilotKit connects your application to agents using the observed test tool response.",
+              : "AG-UI connects your application to agents using the observed test tool response.",
             truncated: false,
           };
         },
@@ -225,7 +225,7 @@ test("AI Mock drives the real TanStack BuiltInAgent through two browser tool rou
     agent.addMessage({
       id: randomUUID(),
       role: "user",
-      content: "Summarize https://copilotkit.ai",
+      content: "Summarize https://docs.ag-ui.com",
     });
     const second = await agent.runAgent();
     assert.deepEqual(errors, []);
@@ -233,7 +233,7 @@ test("AI Mock drives the real TanStack BuiltInAgent through two browser tool rou
       second.newMessages.map((message) => ("content" in message ? message.content : "")).join(" "),
       /observed test tool response/,
     );
-    assert.deepEqual(visited, ["https://news.ycombinator.com", "https://copilotkit.ai"]);
+    assert.deepEqual(visited, ["https://news.ycombinator.com", "https://docs.ag-ui.com"]);
     assert.equal(mock.getRequests().length, 4);
   } finally {
     if (previousBase === undefined) delete process.env.OPENAI_BASE_URL;

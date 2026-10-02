@@ -13,7 +13,7 @@ Modular monolith at the API. Isolated agent runs. Separate Chromium worker. Not 
 Seeker UI (localhost Expo web)
         |
         v
-OpenApply API (Hono + CopilotKit runtime + job control plane)
+OpenApply API (Hono + self-owned TanStack AI / AG-UI chat harness + job control plane)
         |
         +-- Store (PGlite or PostgreSQL)
         +-- File volume

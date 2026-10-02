@@ -35,7 +35,7 @@ Scores. In-app + Telegram.
 
 ## Slice 7 — Resume, cover, packer
 
-T1–T10 versioned prompts in `docs/agents/prompts/`. Statement when required. Drafts cite the evidence locker. One job per run. Pack folder.
+T1–T10 versioned prompts in `apps/server/src/prompts/`. Statement when required. Drafts cite the evidence locker. One job per run. Pack folder.
 
 ## Slice 8 — HR reviewer and approvals
 

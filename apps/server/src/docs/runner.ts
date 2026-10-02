@@ -1,9 +1,9 @@
 /**
  * Document runner: executes one agent role per run from a versioned prompt.
  *
- * Laws (docs/agents/AGENTS.md):
+ * Laws (docs/AGENTS.md):
  *  - One role per run, one instructions_ref per packet. The runner loads
- *    exactly one prompt file; it never concatenates docs/agents/prompts/.
+ *    exactly one prompt file; it never concatenates the prompts directory.
  *  - Job descriptions are untrusted data, passed to the model as data.
  *  - Model keys never enter prompts — the gateway owns transport.
  *  - Missing evidence produces a question, not an invention (the prompts
@@ -79,8 +79,8 @@ export function isBuilderRef(ref: string): boolean {
 function promptsDir(): string {
   if (process.env.DOCS_PROMPTS_DIR) return process.env.DOCS_PROMPTS_DIR;
   const here = dirname(fileURLToPath(import.meta.url));
-  // apps/server/src/docs -> repo root
-  return join(here, "..", "..", "..", "..", "docs", "agents", "prompts");
+  // apps/server/src/docs -> apps/server/src/prompts
+  return join(here, "..", "prompts");
 }
 
 /**

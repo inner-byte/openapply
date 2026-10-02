@@ -2,7 +2,6 @@ import "../config.ts";
 import { createHash, randomUUID } from "node:crypto";
 import { AbstractAgent } from "@ag-ui/client";
 import { type BaseEvent, EventType, type RunAgentInput } from "@ag-ui/core";
-import { defineTool } from "@copilotkit/runtime/v2";
 import { Observable } from "rxjs";
 import { z } from "zod";
 import {
@@ -15,7 +14,13 @@ import type { Config } from "../config.ts";
 import type { ModelAccounts, ModelProvider } from "../models.ts";
 import { defaultBaseUrls, modelProviders } from "../models.ts";
 import type { AgentService } from "./service.ts";
-import { CHAT_PROVIDER_CONTEXT, type ChatModelAuth, tanstackAgent } from "./tanstack-agent.ts";
+import {
+  type ApprovalRequest,
+  CHAT_PROVIDER_CONTEXT,
+  type ChatModelAuth,
+  tanstackAgent,
+} from "./tanstack-agent.ts";
+import { defineTool } from "./tools.ts";
 
 /** Dependencies for resolving the chat panel's per-session provider
  *  selection (Slice 15). */
@@ -30,11 +35,24 @@ export class ConversationAgent extends AbstractAgent {
     private readonly service: AgentService,
     private readonly owner: string,
     private readonly chatProviders?: ChatProviderDeps,
+    /**
+     * Human-approval channel for tools declared with `interrupt: true`.
+     * When absent, such tools fail instead of executing silently.
+     */
+    private readonly approvals?: {
+      requestApproval(request: ApprovalRequest, signal: AbortSignal): Promise<boolean>;
+    },
   ) {
     super({ agentId: "default" });
   }
   clone(): ConversationAgent {
-    return new ConversationAgent(this.config, this.service, this.owner, this.chatProviders);
+    return new ConversationAgent(
+      this.config,
+      this.service,
+      this.owner,
+      this.chatProviders,
+      this.approvals,
+    );
   }
 
   /** The chat panel's provider selection, carried as agent context by the
@@ -44,7 +62,17 @@ export class ConversationAgent extends AbstractAgent {
     input: RunAgentInput,
   ): { provider: string; model?: string } | undefined {
     const entry = input.context?.find((c) => c.description === CHAT_PROVIDER_CONTEXT);
-    const value = entry?.value as { provider?: unknown; model?: unknown } | null | undefined;
+    // The REST chat route JSON-encodes the selection into the string context
+    // value; older clients may pass the object directly. Accept both.
+    const raw = entry?.value as unknown;
+    let value: { provider?: unknown; model?: unknown } | null | undefined;
+    if (typeof raw === "string") {
+      try {
+        value = JSON.parse(raw) as { provider?: unknown; model?: unknown } | null;
+      } catch {
+        return undefined;
+      }
+    } else value = raw as { provider?: unknown; model?: unknown } | null | undefined;
     if (!value || typeof value.provider !== "string" || !value.provider) return undefined;
     return {
       provider: value.provider,
@@ -296,6 +324,7 @@ export class ConversationAgent extends AbstractAgent {
       void this.resolveChatModel(input).then(
         ({ spec, auth }) => {
           if (cancelled) return;
+          const approvals = this.approvals;
           agent = tanstackAgent({
             model: spec,
             modelAuth: auth,
@@ -304,6 +333,9 @@ export class ConversationAgent extends AbstractAgent {
               "I reached my step limit for this reply before finishing. Say “continue” and I’ll pick up where I left off.",
             tools,
             prompt,
+            onApprovalRequest: approvals
+              ? (request, signal) => approvals.requestApproval(request, signal)
+              : undefined,
           });
           subscription = agent
             .run({ ...input, tools: input.tools.filter((t) => t.name === "open_workspace") })

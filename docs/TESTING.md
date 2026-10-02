@@ -22,7 +22,7 @@ Status: Approved
 - A certificate name that is not in the evidence locker cannot appear in resume, cover, or statement
 - A confirmed certificate issuer and title can be cited in resume, cover, and statement
 - Pack approval succeeds on an HR-reviewed pack (no detector-evasion pass; removed, ADR-021)
-- Prompt packets load one `instructions_ref` file. They do not concatenate `docs/agents/prompts/`
+- Prompt packets load one `instructions_ref` file. They do not concatenate `apps/server/src/prompts/`
 - ChatGPT OAuth, Grok OAuth, and API-key connects all reach the same gateway interface
 - Job detail includes `source_url`
 - Scan interval `5` rejected; `12` accepted

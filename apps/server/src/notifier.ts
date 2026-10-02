@@ -1,7 +1,7 @@
 /**
  * Notifier (Slice 6): in-app inbox + Telegram.
  *
- * Laws per docs/agents/prompts/notifier.md: notifications say what happened
+ * Laws per apps/server/src/prompts/notifier.md: notifications say what happened
  * and which job (title + company only). They never carry resume/cover/
  * statement text, certificate images, credential ids, or keys.
  */

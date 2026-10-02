@@ -1,6 +1,5 @@
 import { randomUUID } from "node:crypto";
 import { MessageSchema } from "@ag-ui/core";
-import { CopilotKitIntelligence } from "@copilotkit/runtime/v2";
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { cors } from "hono/cors";
@@ -9,12 +8,13 @@ import { emailDraftSchema, proposalSchema } from "../../../packages/domain/src/i
 import { isCustomProviderId } from "../../../packages/domain/src/openapply.ts";
 import { ActionService } from "./actions.ts";
 import { registerAdaptiveCvRoutes } from "./adaptive-cv.ts";
-import { agentConfigured, makeRuntime } from "./agent.ts";
+import { agentConfigured } from "./agent.ts";
 import { registerApplicationRoutes } from "./applications.ts";
 import { registerApplyRoutes } from "./apply/routes.ts";
 import { createAuth } from "./auth.ts";
 import { BrowserService } from "./browser.ts";
-import { assertApiDeploymentConfig, type Config } from "./config.ts";
+import { ChatApprovals, ensureThread, registerChatRoutes } from "./chat.ts";
+import type { Config } from "./config.ts";
 import type { Store } from "./db.ts";
 import { DomainService } from "./domain.ts";
 import { agentRoutes } from "./engine/routes.ts";
@@ -33,7 +33,6 @@ import { registerTrackerRoutes } from "./tracker/routes.ts";
 import { WorkspaceService } from "./workspace.ts";
 
 export async function createApp(db: Store, config: Config) {
-  assertApiDeploymentConfig(config);
   const auth = await createAuth(db, config),
     files = new Files(db, config, auth),
     google = new GoogleAuth(db, config),
@@ -69,11 +68,10 @@ export async function createApp(db: Store, config: Config) {
   });
   const browser = new BrowserService(db, config, auth, files);
   const agent = new AgentService(db, config, workspace, files, actions, browser);
-  const intelligence = new CopilotKitIntelligence({ apiKey: config.intelligenceApiKey });
-  const runtime = makeRuntime(config, agent, auth, intelligence, {
-    modelAccounts,
-    getPreferences: (owner: string) => domain.getPreferences(owner),
-  });
+  // Human-approval gate for chat tool calls that need it; pending approvals
+  // survive in the store so a restart still lists them (deciding a stale run
+  // returns 410).
+  const approvals = new ChatApprovals(db);
   const app = new Hono<{ Variables: { owner: string } }>();
   const origins = new Set([...config.allowedOrigins, new URL(config.publicUrl).origin]);
   app.use("*", async (c, next) => {
@@ -241,19 +239,9 @@ export async function createApp(db: Store, config: Config) {
     });
     const main = await db.get<{ threadId: string }>(owner, "conversation-settings", "main");
     if (!main) throw new AppError("Main conversation could not be loaded", 503);
-    try {
-      await intelligence.getOrCreateThread({
-        threadId: main.threadId,
-        userId: owner,
-        agentId: "default",
-      });
-    } catch {
-      throw new AppError(
-        "Main conversation is unavailable. Check the Rich Threads connection and try again.",
-        502,
-      );
-    }
-    return c.json({ threadId: main.threadId, existing: true });
+    // Threads now live in the app's own store instead of cloud storage.
+    const thread = await ensureThread(db, owner, main.threadId);
+    return c.json({ threadId: thread.id, existing: true });
   });
   app.get("/api/conversation", async (c) =>
     c.json((await db.get(c.get("owner"), "conversations", "default")) ?? { messages: [] }),
@@ -423,6 +411,7 @@ export async function createApp(db: Store, config: Config) {
   registerApplyRoutes(app, db, config, domain, profile, browser, gateway);
   registerBrowserHuntRoutes(app, domain, browser, gateway);
   registerTrackerRoutes(app, db, domain, workspace, gateway);
+  registerChatRoutes(app, db, config, agent, modelAccounts, domain, approvals);
   app.put("/api/preferences", async (c) =>
     c.json(await domain.updatePreferences(c.get("owner"), await c.req.json())),
   );
@@ -603,24 +592,6 @@ export async function createApp(db: Store, config: Config) {
   app.post("/api/browsers/:id/console", async (c) => {
     await browser.input(c.get("owner"), c.req.param("id"), await c.req.json());
     return c.json({ ok: true });
-  });
-  app.all("/api/copilotkit/*", async (c) => {
-    if (!agentConfigured(config))
-      throw new AppError(
-        "Configure a model and provider API key, or a valid AG-UI endpoint, to start chat",
-        503,
-      );
-    const response = await runtime.fetch(c.req.raw);
-    // Runtime 1.70 emits SSE strings; a WHATWG Response body requires byte chunks.
-    const encoder = new TextEncoder();
-    const body = response.body?.pipeThrough(
-      new TransformStream({
-        transform(chunk, controller) {
-          controller.enqueue(typeof chunk === "string" ? encoder.encode(chunk) : chunk);
-        },
-      }),
-    );
-    return new Response(body, { status: response.status, headers: response.headers });
   });
   app.get("/", (c) =>
     c.json({ name: "OpenApply", app: "http://localhost:8081", health: "/api/health" }),

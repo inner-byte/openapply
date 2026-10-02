@@ -36,8 +36,8 @@ const PROMPT_FILE = "hunter_browser.md";
 function promptsDir(): string {
   if (process.env.DOCS_PROMPTS_DIR) return process.env.DOCS_PROMPTS_DIR;
   const here = dirname(fileURLToPath(import.meta.url));
-  // apps/server/src/hunter -> repo root
-  return join(here, "..", "..", "..", "..", "docs", "agents", "prompts");
+  // apps/server/src/hunter -> apps/server/src/prompts
+  return join(here, "..", "prompts");
 }
 
 async function loadHunterPrompt(): Promise<{ system: string }> {

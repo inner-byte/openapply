@@ -212,7 +212,7 @@ failure notify + shortlisted + rethrow.
 
 Ahmad decided the system needs a central orchestrator modeled on how Meyau
 itself works: a parent orchestrator that dispatches one specialist agent per
-run (mirroring the docs/agents/AGENTS.md law "one role per run", like one
+run (mirroring the docs/AGENTS.md law "one role per run", like one
 subagent per task), watches run states (queued → running → done/failed), and
 emits state updates as agents run — the same way Meyau reports subagent
 progress.
@@ -387,7 +387,7 @@ terminal applications are never matched.
   interactive tools, not pipeline builders.
 - `apps/server/src/docs/runner.ts` — one role per run, one `instructions_ref`
   per packet. Loads exactly one prompt file (never concatenates
-  `docs/agents/prompts/`); job descriptions travel as `description_untrusted`
+  `apps/server/src/prompts/`); job descriptions travel as `description_untrusted`
   data; model keys never enter prompts (the gateway owns transport).
 - `apps/server/src/docs/grounding.ts` — drafts cite the evidence locker:
   every certificate named in a resume must match a *confirmed* locker item
@@ -577,7 +577,7 @@ mandatory case, now tested). Sequential runs share no chat history; each
 run's messages are built fresh from its own payload. One role per run:
 the packet carries exactly one role and one instructions_ref, and unknown
 refs fail instead of concatenating prompt files. Every prompt file in
-`docs/agents/prompts/` (20+) parses with role/tier/instructions_ref
+`apps/server/src/prompts/` (20+) parses with role/tier/instructions_ref
 frontmatter, and every runner-registered ref resolves.
 
 **Cost caps**: the gateway budget governor now covers both tiers.

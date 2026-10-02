@@ -7,7 +7,7 @@
  *   first run's output. No shared chat history between roles.
  * - One role per run: the packet carries exactly one role and one
  *   instructions_ref; unknown refs fail instead of concatenating files.
- * - Every prompt file in docs/agents/prompts parses with role, tier, and
+ * - Every prompt file in apps/server/src/prompts parses with role, tier, and
  *   instructions_ref frontmatter, and every registered ref resolves.
  */
 import assert from "node:assert/strict";
@@ -19,7 +19,7 @@ import { buildRunnerPacket, loadPrompt, runDocumentRole } from "../apps/server/s
 import type { CompleteInput, CompleteResult } from "../apps/server/src/gateway.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const promptsDir = join(here, "..", "docs", "agents", "prompts");
+const promptsDir = join(here, "..", "apps", "server", "src", "prompts");
 
 function modelReply(output: unknown): CompleteResult {
   return {

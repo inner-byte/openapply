@@ -1394,7 +1394,7 @@ export function ConnectionsScreen({ query = "" }: { query?: string }) {
               />
               <SettingsLine
                 label="Rich Threads"
-                value={w.runtime.richThreads ? "CopilotKit Intelligence" : "Not connected"}
+                value={w.runtime.richThreads ? "OpenApply chat" : "Not connected"}
               />
               <Button
                 small

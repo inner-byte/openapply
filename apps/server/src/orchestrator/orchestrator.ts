@@ -2,7 +2,7 @@
  * Central orchestrator (Slice 13).
  *
  * Modeled on how a parent agent works: it dispatches one specialist
- * subagent per run (the docs/agents "one role per run" law), watches run
+ * subagent per run (the docs/AGENTS.md "one role per run" law), watches run
  * states (queued -> running -> done/failed), and emits state updates as
  * runs progress.
  *
